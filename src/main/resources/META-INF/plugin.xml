@@ -3,8 +3,22 @@
     <id>com.github.lseodoo.odoorunconfig</id>
     <name>odoo-run-config</name>
     <vendor>lse-odoo</vendor>
+    <version>1.0.0</version>
+
+    <!-- Please update the since-build and until-build attributes as needed -->
+    <idea-version since-build="252" />
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>PythonCore</depends>
+
+    <description><![CDATA[
+    Simple PyCharm plugin to handle Odoo run configuration
+    ]]></description>
+
+    <change-notes><![CDATA[
+    Initial release.
+    ]]>
+    </change-notes>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
