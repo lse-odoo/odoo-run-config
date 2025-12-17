@@ -25,5 +25,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="com.github.lseodoo.odoorunconfig.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
         <postStartupActivity implementation="com.github.lseodoo.odoorunconfig.startup.MyProjectActivity" />
+        <configurationType implementation="com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfigurationType"/>
     </extensions>
 </idea-plugin>
