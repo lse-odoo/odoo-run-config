@@ -1,68 +1,46 @@
 package com.github.lseodoo.odoorunconfig.runConfig;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.Executor;
-import com.intellij.execution.configurations.CommandLineState;
 import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.execution.configurations.RunConfigurationBase;
-import com.intellij.execution.configurations.RunProfileState;
-import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.execution.process.OSProcessHandler;
-import com.intellij.execution.process.ProcessHandler;
-import com.intellij.execution.process.ProcessHandlerFactory;
-import com.intellij.execution.process.ProcessTerminatedListener;
 import com.intellij.openapi.options.SettingsEditor;
+import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
+import com.jetbrains.python.run.PythonRunConfiguration;
+import com.jetbrains.python.run.PythonRunConfigurationEditor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+public class OdooRunConfiguration extends PythonRunConfiguration {
 
-public class OdooRunConfiguration extends RunConfigurationBase<OdooRunConfigurationOptions> {
+//    private OdooRunConfigurationOptions odooOptions = new OdooRunConfigurationOptions();
 
-    protected OdooRunConfiguration(Project project,
-                                   ConfigurationFactory factory,
-                                   String name) {
-        super(project, factory, name);
+    // The factory creates the configuration with a name.
+    // We must call the parent's 2-argument constructor and then set the name.
+    public OdooRunConfiguration(Project project, ConfigurationFactory factory, String name) {
+        super(project, factory);
+        setName(name);
     }
 
-    @NotNull
+//    @Override
+//    public void writeExternal(@NotNull Element element) {
+//        super.writeExternal(element);
+//        Element odooOptionsElement = new Element("odoo-options");
+//        XmlSerializer.serializeInto(this.odooOptions, odooOptionsElement);
+//        element.addContent(odooOptionsElement);
+//    }
+//
+//    @Override
+//    public void readExternal(@NotNull Element element) {
+//        super.readExternal(element);
+//        Element odooOptionsElement = element.getChild("odoo-options");
+//        if (odooOptionsElement != null) {
+//            XmlSerializer.deserializeInto(this.odooOptions, odooOptionsElement);
+//        }
+//    }
+
     @Override
-    protected OdooRunConfigurationOptions getOptions() {
-        return (OdooRunConfigurationOptions) super.getOptions();
+    protected @NotNull SettingsEditor<PythonRunConfiguration> createConfigurationEditor() {
+        SettingsEditorGroup<PythonRunConfiguration> group = new SettingsEditorGroup<>();
+        group.addEditor("Configuration", new PythonRunConfigurationEditor(this));
+//        group.addEditor("Odoo", new OdooSettingsEditor());
+        return group;
     }
-
-    public String getScriptName() {
-        return getOptions().getScriptName();
-    }
-
-    public void setScriptName(String scriptName) {
-        getOptions().setScriptName(scriptName);
-    }
-
-    @NotNull
-    @Override
-    public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
-        return new OdooSettingsEditor();
-    }
-
-    @Nullable
-    @Override
-    public RunProfileState getState(@NotNull Executor executor,
-                                    @NotNull ExecutionEnvironment environment) {
-        return new CommandLineState(environment) {
-            @NotNull
-            @Override
-            protected ProcessHandler startProcess() throws ExecutionException {
-                GeneralCommandLine commandLine =
-                        new GeneralCommandLine(getOptions().getScriptName());
-                OSProcessHandler processHandler = ProcessHandlerFactory.getInstance()
-                        .createColoredProcessHandler(commandLine);
-                ProcessTerminatedListener.attach(processHandler);
-                return processHandler;
-            }
-        };
-    }
-
 }

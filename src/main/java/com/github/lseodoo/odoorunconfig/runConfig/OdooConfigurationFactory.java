@@ -1,14 +1,12 @@
 package com.github.lseodoo.odoorunconfig.runConfig;
 
-import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.ConfigurationType;
 import com.intellij.execution.configurations.RunConfiguration;
-import com.intellij.openapi.components.BaseState;
 import com.intellij.openapi.project.Project;
+import com.jetbrains.python.run.PythonConfigurationFactoryBase;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-public class OdooConfigurationFactory extends ConfigurationFactory {
+public class OdooConfigurationFactory extends PythonConfigurationFactoryBase {
     protected OdooConfigurationFactory(ConfigurationType type) {
         super(type);
     }
@@ -22,13 +20,6 @@ public class OdooConfigurationFactory extends ConfigurationFactory {
     @Override
     public RunConfiguration createTemplateConfiguration(
             @NotNull Project project) {
-        return new OdooRunConfiguration(project, this, "Demo");
+        return new OdooRunConfiguration(project, this, "Odoo Demo");
     }
-
-    @Nullable
-    @Override
-    public Class<? extends BaseState> getOptionsClass() {
-        return OdooRunConfigurationOptions.class;
-    }
-
 }
