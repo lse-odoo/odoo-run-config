@@ -1,12 +1,8 @@
 package com.github.lseodoo.odoorunconfig.runConfig;
 
 import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.openapi.options.SettingsEditor;
-import com.intellij.openapi.options.SettingsEditorGroup;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.python.run.PythonRunConfiguration;
-import com.jetbrains.python.run.PythonRunConfigurationEditor;
-import org.jetbrains.annotations.NotNull;
 
 public class OdooRunConfiguration extends PythonRunConfiguration {
 
@@ -36,11 +32,11 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
 //        }
 //    }
 
-    @Override
-    protected @NotNull SettingsEditor<PythonRunConfiguration> createConfigurationEditor() {
-        SettingsEditorGroup<PythonRunConfiguration> group = new SettingsEditorGroup<>();
-        group.addEditor("Configuration", new PythonRunConfigurationEditor(this));
+//    @Override
+//    protected @NotNull SettingsEditor<PythonRunConfiguration> createConfigurationEditor() {
+//        SettingsEditorGroup<PythonRunConfiguration> group = new SettingsEditorGroup<>();
+//        group.addEditor("Configuration", new PythonRunConfigurationEditor(this));
 //        group.addEditor("Odoo", new OdooSettingsEditor());
-        return group;
-    }
+//        return group;
+//    }
 }
