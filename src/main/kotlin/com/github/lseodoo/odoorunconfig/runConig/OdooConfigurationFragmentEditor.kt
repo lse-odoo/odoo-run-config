@@ -13,9 +13,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
 
     override fun customizeFragments(fragments: MutableList<SettingsEditorFragment<PythonRunConfiguration, *>>) {
 //        super.customizeFragments(fragments) // Can't call as parent is abstrat
-
-        // Add your custom fragment
-        fragments.add(createOdooCustomFieldFragment())
+        addToFragmentsBeforeEditors(fragments, createOdooCustomFieldFragment())
     }
 
     private fun createOdooCustomFieldFragment(): SettingsEditorFragment<PythonRunConfiguration, LabeledComponent<JBTextField>> {
