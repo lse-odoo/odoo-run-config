@@ -21,6 +21,11 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     public OdooRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory);
         setName(name);
+
+        // Default option (difference from python configuration)
+        setAddContentRoots(false);
+        setAddSourceRoots(false);
+        setEmulateTerminal(true);
     }
 
     public String getOdooBinFilePath() {
