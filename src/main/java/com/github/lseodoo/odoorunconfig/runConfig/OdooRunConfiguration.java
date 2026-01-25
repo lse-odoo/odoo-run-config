@@ -13,11 +13,11 @@ import org.jetbrains.annotations.NotNull;
 public class OdooRunConfiguration extends PythonRunConfiguration {
 
     public static final String ODOO_BIN_PATH_NAME = "ODOO_BIN_PATH_NAME";
+    public static final String ODOO_PARAMETERS_NAME = "ODOO_PARAMETERS";
 
     private String odooBinFilePath;
+    private String odooArbitraryParameters;
 
-    // The factory creates the configuration with a name.
-    // We must call the parent's 2-argument constructor and then set the name.
     public OdooRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory);
         setName(name);
@@ -32,10 +32,20 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         return odooBinFilePath;
     }
 
-    public void setOdooBinFilePath(String myCustomField) {
-        this.odooBinFilePath = myCustomField;
-        // The odoo-bin path is the file to run as a script (in pycharm run config context)
+    public void setOdooBinFilePath(String path) {
+        this.odooBinFilePath = path;
+        // The odoo-bin path is the file to run as a script
         setScriptName(odooBinFilePath);
+    }
+
+    public String getOdooArbitraryParameters() {
+        return odooArbitraryParameters;
+    }
+
+    public void setOdooArbitraryParameters(String params) {
+        this.odooArbitraryParameters = params;
+        // Arbitrary parameters is equivalent to the script parameters
+        setScriptParameters(params);
     }
 
     @Override
@@ -50,15 +60,15 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     @Override
     public void readExternal(@NotNull Element element) {
         super.readExternal(element);
-        // Load our custom field
         odooBinFilePath = JDOMExternalizerUtil.readField(element, ODOO_BIN_PATH_NAME);
+        odooArbitraryParameters = JDOMExternalizerUtil.readField(element, ODOO_PARAMETERS_NAME);
     }
 
     @Override
     public void writeExternal(@NotNull Element element) {
         super.writeExternal(element);
-        // Save our custom field
         JDOMExternalizerUtil.writeField(element, ODOO_BIN_PATH_NAME, odooBinFilePath);
+        JDOMExternalizerUtil.writeField(element, ODOO_PARAMETERS_NAME, odooArbitraryParameters);
     }
 
     @NotNull
