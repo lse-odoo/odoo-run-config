@@ -5,18 +5,23 @@ import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.JDOMExternalizerUtil;
+import com.intellij.util.xmlb.annotations.Attribute;
+import com.intellij.util.xmlb.XmlSerializer;
 import com.jetbrains.python.run.PythonRunConfiguration;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 
 public class OdooRunConfiguration extends PythonRunConfiguration {
 
-    public static final String ODOO_BIN_PATH_NAME = "ODOO_BIN_PATH_NAME";
-    public static final String ODOO_PARAMETERS_NAME = "ODOO_PARAMETERS";
+    public static class OdooState {
+        @Attribute("odoo-bin-path")
+        public String odooBinFilePath;
 
-    private String odooBinFilePath;
-    private String odooArbitraryParameters;
+        @Attribute("odoo-parameters")
+        public String odooParameters;
+    }
+
+    private final OdooState myOdooState = new OdooState();
 
     public OdooRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory);
@@ -28,31 +33,12 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         setEmulateTerminal(true);
     }
 
-    public String getOdooBinFilePath() {
-        return odooBinFilePath;
-    }
-
-    public void setOdooBinFilePath(String path) {
-        this.odooBinFilePath = path;
-        // The odoo-bin path is the file to run as a script
-        setScriptName(odooBinFilePath);
-    }
-
-    public String getOdooArbitraryParameters() {
-        return odooArbitraryParameters;
-    }
-
-    public void setOdooArbitraryParameters(String params) {
-        this.odooArbitraryParameters = params;
-        // Arbitrary parameters is equivalent to the script parameters
-        setScriptParameters(params);
-    }
 
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
         super.checkConfiguration();
 
-        if (!odooBinFilePath.endsWith("odoo-bin")) {
+        if (getOdooBinFilePath() != null && !getOdooBinFilePath().endsWith("odoo-bin")) {
             throw new RuntimeConfigurationException("The odoo-bin file path must end with 'odoo-bin'");
         }
     }
@@ -60,20 +46,29 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     @Override
     public void readExternal(@NotNull Element element) {
         super.readExternal(element);
-        odooBinFilePath = JDOMExternalizerUtil.readField(element, ODOO_BIN_PATH_NAME);
-        odooArbitraryParameters = JDOMExternalizerUtil.readField(element, ODOO_PARAMETERS_NAME);
+        XmlSerializer.deserializeInto(this, element);
     }
 
     @Override
     public void writeExternal(@NotNull Element element) {
         super.writeExternal(element);
-        JDOMExternalizerUtil.writeField(element, ODOO_BIN_PATH_NAME, odooBinFilePath);
-        JDOMExternalizerUtil.writeField(element, ODOO_PARAMETERS_NAME, odooArbitraryParameters);
+        XmlSerializer.serializeInto(this, element);
     }
 
     @NotNull
     @Override
     protected SettingsEditor<PythonRunConfiguration> createConfigurationEditor() {
         return new OdooConfigurationFragmentEditor(this);
+    }
+
+    public String getOdooBinFilePath() { return myOdooState.odooBinFilePath; }
+    public void setOdooBinFilePath(String path) {
+        myOdooState.odooBinFilePath = path;
+        setScriptName(path);
+    }
+    public String getOdooParameters() { return myOdooState.odooParameters; }
+    public void setOdooParameters(String params) {
+        myOdooState.odooParameters = params;
+        setScriptParameters(params);
     }
 }

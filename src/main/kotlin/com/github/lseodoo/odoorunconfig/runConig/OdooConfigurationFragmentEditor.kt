@@ -3,7 +3,6 @@ package com.github.lseodoo.odoorunconfig.runConig
 import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.execution.ui.SettingsEditorFragment
-import com.intellij.execution.ui.SettingsEditorFragmentType
 import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.LabeledComponent
@@ -21,7 +20,6 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
 
     override fun customizeFragments(fragments: MutableList<SettingsEditorFragment<PythonRunConfiguration, *>>) {
         // super.customizeFragments(fragments) // Can't call as parent is abstract
-
         addToFragmentsBeforeEditors(fragments, createOdooArbitraryParametersFragment())
         addToFragmentsBeforeEditors(fragments, createOdooBinCustomFragment())
     }
@@ -35,8 +33,8 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             "Odoo arbitrary parameters",
             "Odoo",
             parametersEditor,
-            { config: PythonRunConfiguration, field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { field.text = it.odooArbitraryParameters } },
-            { config: PythonRunConfiguration , field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { it.odooArbitraryParameters = field.text.trim() } },
+            { config: PythonRunConfiguration, field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { field.text = it.odooParameters } },
+            { config: PythonRunConfiguration , field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { it.odooParameters = field.text.trim() } },
             { true })
         MacrosDialog.addMacroSupport(parametersEditor.editorField, MacrosDialog.Filters.ALL) { false }
         parametersEditor.editorField.emptyText.setText(PyBundle.message("python.run.configuration.fragments.script.parameters.hint"))
