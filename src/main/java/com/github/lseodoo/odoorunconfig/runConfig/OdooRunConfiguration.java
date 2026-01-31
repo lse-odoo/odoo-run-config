@@ -40,7 +40,6 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         setEmulateTerminal(true);
     }
 
-
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
         super.checkConfiguration();
@@ -48,6 +47,20 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         if (getOdooBinFilePath() != null && !getOdooBinFilePath().endsWith("odoo-bin")) {
             throw new RuntimeConfigurationException("The odoo-bin file path must end with 'odoo-bin'");
         }
+    }
+
+    @Override
+    public String getScriptParameters() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(super.getScriptParameters());
+
+        if (!getAddonsPaths().isEmpty()) {
+            sb.append(" --addons-path=");
+            sb.append(String.join(",", getAddonsPaths()));
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -80,5 +93,4 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     }
     public List<String> getAddonsPaths() { return myOdooState.odooParametersAddonsPath; }
     public void setAddonsPaths(List<String> paths) { myOdooState.odooParametersAddonsPath = paths; }
-
 }
