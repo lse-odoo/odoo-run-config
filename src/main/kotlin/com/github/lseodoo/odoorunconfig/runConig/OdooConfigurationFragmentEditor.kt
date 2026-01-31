@@ -72,14 +72,37 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
         val decorator = ToolbarDecorator.createDecorator(addonsList)
             .setAddAction {
                 val descriptor = FileChooserDescriptorFactory.createMultipleFoldersDescriptor()
-                descriptor.title = "Select Odoo Addons Folder(s)"
-                // Use FileChooser.chooseFiles to get the selected files
+                descriptor.title = "Select Odoo Addons Folders"
+
                 com.intellij.openapi.fileChooser.FileChooser.chooseFiles(descriptor, null, null) { files ->
                     files.forEach { listModel.addElement(it.path) }
                 }
             }
             .setRemoveAction {
                 addonsList.selectedValuesList.forEach { listModel.removeElement(it) }
+            }
+            .setEditAction {
+                val selectedIndex = addonsList.selectedIndex
+                if (selectedIndex < 0) return@setEditAction
+
+                val oldPath = addonsList.selectedValue
+
+                // 1. Create a descriptor for selecting a SINGLE folder.
+                val descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                descriptor.title = "Modify Addons Path"
+
+                // 2. Find the VirtualFile for the old path to use as a starting point.
+                val oldVirtualFile = com.intellij.openapi.vfs.LocalFileSystem.getInstance().findFileByPath(oldPath)
+
+                // 3. The file to select in the chooser must be a directory.
+                val fileToSelect = if (oldVirtualFile != null && oldVirtualFile.isDirectory) oldVirtualFile else null
+
+                // 4. Show the file chooser for a single file.
+                com.intellij.openapi.fileChooser.FileChooser.chooseFile(descriptor, null, fileToSelect) { chosenFile ->
+                    // This lambda is executed when the user selects a new folder.
+                    // Update the model with the new path at the same index.
+                    listModel.setElementAt(chosenFile.path, selectedIndex)
+                }
             }
 
         val component = decorator.createPanel()
@@ -88,7 +111,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
         // to match the component and the lambdas below.
         return SettingsEditorFragment(
             "odoo.script.parameters.addons-path",
-            "Odoo Addons Path",
+            "Odoo addons path",
             "Odoo",
             component,
 
