@@ -7,9 +7,13 @@ import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.xmlb.annotations.Attribute;
 import com.intellij.util.xmlb.XmlSerializer;
+import com.intellij.util.xmlb.annotations.XCollection;
 import com.jetbrains.python.run.PythonRunConfiguration;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OdooRunConfiguration extends PythonRunConfiguration {
 
@@ -19,6 +23,9 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
 
         @Attribute("odoo-parameters")
         public String odooParameters;
+
+        @XCollection(elementName = "odoo-parmaters-addons-path")
+        public List<String> odooParametersAddonsPath = new ArrayList<>();
     }
 
     private final OdooState myOdooState = new OdooState();
@@ -71,4 +78,7 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         myOdooState.odooParameters = params;
         setScriptParameters(params);
     }
+    public List<String> getAddonsPaths() { return myOdooState.odooParametersAddonsPath; }
+    public void setAddonsPaths(List<String> paths) { myOdooState.odooParametersAddonsPath = paths; }
+
 }
