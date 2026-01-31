@@ -68,6 +68,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
         val listModel = DefaultListModel<String>()
         val addonsList = JBList(listModel)
 
+        addonsList.visibleRowCount = 4
         val decorator = ToolbarDecorator.createDecorator(addonsList)
             .setAddAction {
                 val descriptor = FileChooserDescriptorFactory.createMultipleFoldersDescriptor()
