@@ -22,8 +22,8 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
     override fun customizeFragments(fragments: MutableList<SettingsEditorFragment<PythonRunConfiguration, *>>) {
         // super.customizeFragments(fragments) // Can't call as parent is abstract
 
+        addToFragmentsBeforeEditors(fragments, createOdooArbitraryParametersFragment())
         addToFragmentsBeforeEditors(fragments, createOdooBinCustomFragment())
-        fragments.add(createOdooArbitraryParametersFragment())  // TODO: check why it appear just before venv. Same strategy might be use for odoo bin
     }
 
     private fun createOdooArbitraryParametersFragment(): SettingsEditorFragment<PythonRunConfiguration, *> {
@@ -34,7 +34,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             "odoo.script.parameters.arbitrary",
             "Odoo arbitrary parameters",
             "Odoo",
-            parametersEditor, SettingsEditorFragmentType.COMMAND_LINE,
+            parametersEditor,
             { config: PythonRunConfiguration, field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { field.text = it.odooArbitraryParameters } },
             { config: PythonRunConfiguration , field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { it.odooArbitraryParameters = field.text.trim() } },
             { true })
