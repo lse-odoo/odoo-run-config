@@ -3,18 +3,20 @@ package com.github.lseodoo.odoorunconfig.runConig
 import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.execution.ui.SettingsEditorFragment
+import com.intellij.execution.ui.SettingsEditorFragmentType
 import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.LabeledComponent
 import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.ui.emptyText
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.TextComponentEmptyText
-import com.jetbrains.python.PyBundle
 import com.jetbrains.python.run.PythonRunConfiguration
 import com.jetbrains.python.run.configuration.AbstractPythonConfigurationFragmentedEditor
+import java.awt.BorderLayout
 import javax.swing.DefaultListModel
 
 // Note: we can't override from PythonConfigurationFragmentedEditor as "This type is final, so it cannot be extended."
@@ -23,50 +25,38 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
 
     override fun customizeFragments(fragments: MutableList<SettingsEditorFragment<PythonRunConfiguration, *>>) {
         // super.customizeFragments(fragments) // Can't call as parent is abstract
-        addToFragmentsBeforeEditors(fragments, createOdooParametersFragmentAddonsPath())
-        addToFragmentsBeforeEditors(fragments, createOdooArbitraryParametersFragment())
-        addToFragmentsBeforeEditors(fragments, createOdooBinCustomFragment())
+        fragments.add(createOdooBinCustomFragment())
+        fragments.add(createOdooParametersFragmentAddonsPath())
+        fragments.add(createOdooArbitraryParametersFragment())
+
+        // TODO: considering the use of "SettingsEditorGroup" instead of fragment. It can use swing stuff and would be easier to layout and maintain in the time
     }
 
     private fun createOdooBinCustomFragment(): SettingsEditorFragment<PythonRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>> {
         val odoobinPathWidget = TextFieldWithBrowseButton()
         odoobinPathWidget.addBrowseFolderListener(TextBrowseFolderListener(FileChooserDescriptorFactory.singleFile()))
-        val component = LabeledComponent.create(odoobinPathWidget, "Path for `odoo-bin` file")
+        odoobinPathWidget.emptyText.text = "/home/.../odoo/odoo-bin"
+        val odoobinLabel = LabeledComponent.create(odoobinPathWidget, "Path to \"odoo-bin\" file")
+        odoobinLabel.labelLocation = BorderLayout.WEST
 
-        return SettingsEditorFragment(
+        val odoobinPathFragment: SettingsEditorFragment<PythonRunConfiguration, LabeledComponent<TextFieldWithBrowseButton>> = SettingsEditorFragment(
             "odoo.script.odoo-bin.file.path",
-            "Path for `odoo-bin` file",
+            "Path to \"odoo-bin\" file",
             "Odoo",
-            component,
+            odoobinLabel,
+            SettingsEditorFragmentType.COMMAND_LINE,
             { config, _ -> (config as? OdooRunConfiguration)?.let { odoobinPathWidget.text = it.odooBinFilePath } },
             { config, _ -> (config as? OdooRunConfiguration)?.let { it.odooBinFilePath = odoobinPathWidget.text } },
             { true }
         )
-    }
-
-    private fun createOdooArbitraryParametersFragment(): SettingsEditorFragment<PythonRunConfiguration, *> {
-        // Heavily inspired by intellij code, look for: `PythonConfigurationFragmentedEditor` `py.script.parameters`
-        val parametersEditor = RawCommandLineEditor()
-        CommandLinePanel.setMinimumWidth(parametersEditor, MIN_FRAGMENT_WIDTH)
-        val scriptParametersFragment: SettingsEditorFragment<PythonRunConfiguration, RawCommandLineEditor> = SettingsEditorFragment<PythonRunConfiguration, RawCommandLineEditor>(
-            "odoo.script.parameters.arbitrary",
-            "Odoo arbitrary parameters",
-            "Odoo",
-            parametersEditor,
-            { config: PythonRunConfiguration, field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { field.text = it.odooParameters } },
-            { config: PythonRunConfiguration , field: RawCommandLineEditor -> (config as? OdooRunConfiguration)?.let { it.odooParameters = field.text.trim() } },
-            { true })
-        MacrosDialog.addMacroSupport(parametersEditor.editorField, MacrosDialog.Filters.ALL) { false }
-        parametersEditor.editorField.emptyText.setText(PyBundle.message("python.run.configuration.fragments.script.parameters.hint"))
-        TextComponentEmptyText.setupPlaceholderVisibility(parametersEditor.editorField)
-        scriptParametersFragment.setHint(PyBundle.message("python.run.configuration.fragments.script.parameters.hint"))
-        scriptParametersFragment.actionHint = PyBundle.message("python.run.configuration.fragments.script.parameters.hint")
-        return scriptParametersFragment
+        odoobinPathFragment.setHint("Path to \"odoo-bin\" file")
+        return odoobinPathFragment
     }
 
     private fun createOdooParametersFragmentAddonsPath(): SettingsEditorFragment<PythonRunConfiguration, *> {
         val listModel = DefaultListModel<String>()
         val addonsList = JBList(listModel)
+        addonsList.emptyText.text = "No addons path specified"
 
         addonsList.visibleRowCount = 4
         val decorator = ToolbarDecorator.createDecorator(addonsList)
@@ -109,12 +99,12 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
 
         // The fragment should be typed with <PythonRunConfiguration, JComponent>
         // to match the component and the lambdas below.
-        return SettingsEditorFragment(
+        val odooAddonsPathFragment: SettingsEditorFragment<PythonRunConfiguration, *> = SettingsEditorFragment(
             "odoo.script.parameters.addons-path",
             "Odoo addons path",
             "Odoo",
             component,
-
+            SettingsEditorFragmentType.COMMAND_LINE,
             // resetEditorFrom lambda: (config, component) -> Unit
             { config, _ ->
                 // Safely cast to OdooRunConfiguration to access your specific fields
@@ -134,9 +124,32 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
                     odooConfig.addonsPaths = paths
                 }
             },
-
-            // isVisible lambda: (config) -> Boolean
             { true }
         )
+        odooAddonsPathFragment.setHint("List of folders that will be used as odoo addons path")
+        return odooAddonsPathFragment
+    }
+
+    private fun createOdooArbitraryParametersFragment(): SettingsEditorFragment<PythonRunConfiguration, *> {
+        // Heavily inspired by intellij code, look for: `PythonConfigurationFragmentedEditor` `py.script.parameters`
+        val parametersEditor = RawCommandLineEditor()
+        CommandLinePanel.setMinimumWidth(parametersEditor, MIN_FRAGMENT_WIDTH)
+        val odoobinLabel = LabeledComponent.create(parametersEditor, "Odoo arbitrary parameters")
+        odoobinLabel.labelLocation = BorderLayout.WEST
+
+        val scriptParametersFragment: SettingsEditorFragment<PythonRunConfiguration, LabeledComponent<RawCommandLineEditor>> = SettingsEditorFragment(
+            "odoo.script.parameters.arbitrary",
+            "Odoo arbitrary parameters",
+            "Odoo",
+            odoobinLabel,
+            SettingsEditorFragmentType.COMMAND_LINE,
+            { config: PythonRunConfiguration, _ -> (config as? OdooRunConfiguration)?.let { parametersEditor.text = it.odooParameters } },
+            { config: PythonRunConfiguration , _ -> (config as? OdooRunConfiguration)?.let { it.odooParameters = parametersEditor.text.trim() } },
+            { true })
+        MacrosDialog.addMacroSupport(parametersEditor.editorField, MacrosDialog.Filters.ALL) { false }
+        parametersEditor.editorField.emptyText.text = "-i crm -u account,stock ..."
+        TextComponentEmptyText.setupPlaceholderVisibility(parametersEditor.editorField)
+        scriptParametersFragment.setHint("Add any arbitrary Odoo CLI parameters")
+        return scriptParametersFragment
     }
 }
