@@ -88,14 +88,14 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
                         clear()
                         addAll(it.addonsPaths)
                     }
-                    paramsEditor.text = it.odooParameters
+                    paramsEditor.text = it.odooParametersExtra
                 }
             },
             { config, _ ->
                 (config as? OdooRunConfiguration)?.let {
                     it.odooBinFilePath = odooBinField.text
                     it.addonsPaths = addonsListModel.elements().toList()
-                    it.odooParameters = paramsEditor.text.trim()
+                    it.odooParametersExtra = paramsEditor.text.trim()
                 }
             },
             { true }

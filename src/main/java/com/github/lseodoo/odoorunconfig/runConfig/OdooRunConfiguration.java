@@ -21,11 +21,11 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         @Attribute("odoo-bin-path")
         public String odooBinFilePath;
 
-        @Attribute("odoo-parameters")
-        public String odooParameters;
-
         @XCollection(elementName = "odoo-parmaters-addons-path")
         public List<String> odooParametersAddonsPath = new ArrayList<>();
+
+        @Attribute("odoo-parameters-extra")
+        public String odooParametersExtra;
     }
 
     private final OdooState myOdooState = new OdooState();
@@ -86,9 +86,9 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         myOdooState.odooBinFilePath = path;
         setScriptName(path);
     }
-    public String getOdooParameters() { return myOdooState.odooParameters; }
-    public void setOdooParameters(String params) {
-        myOdooState.odooParameters = params;
+    public String getOdooParametersExtra() { return myOdooState.odooParametersExtra; }
+    public void setOdooParametersExtra(String params) {
+        myOdooState.odooParametersExtra = params;
         setScriptParameters(params);
     }
     public List<String> getAddonsPaths() { return myOdooState.odooParametersAddonsPath; }
