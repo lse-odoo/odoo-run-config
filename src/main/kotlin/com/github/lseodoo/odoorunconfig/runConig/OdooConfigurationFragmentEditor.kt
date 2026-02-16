@@ -8,7 +8,6 @@ import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.emptyText
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -57,7 +56,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
                 row("Path to 'odoo-bin':") {
                     // PURE KOTLIN DSL: Using the modernized, non-deprecated signature
                     textFieldWithBrowseButton(
-                        FileChooserDescriptorFactory.createSingleFileDescriptor().withTitle("Select odoo-bin File"),
+                        FileChooserDescriptorFactory.singleFile().withTitle("Select odoo-bin File"),
                         project = null
                     ).applyToComponent {
                         emptyText.text = "/home/.../odoo/odoo-bin"
