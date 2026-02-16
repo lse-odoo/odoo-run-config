@@ -14,6 +14,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.TextComponentEmptyText
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.panel
@@ -48,6 +49,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
 
         // We declare a variable to hold our pure-DSL text field so we can read/write to it later
         lateinit var odooBinField: TextFieldWithBrowseButton
+        lateinit var databaseField: JBTextField
 
         // 2. Build the Layout
         val settingsPanel = panel {
@@ -62,6 +64,14 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
                         emptyText.text = "/home/.../odoo/odoo-bin"
                         odooBinField = this
                     }.align(AlignX.FILL)
+                }
+
+                row("Database name:") {
+                    textField().applyToComponent {
+                        emptyText.text = "e.g., my_odoo_db"
+                        databaseField = this
+                    }.align(AlignX.FILL)
+                        .comment("The database to connect to (appends the -d flag). Leave empty to use the default.")
                 }
 
                 row("Addons paths:") {
@@ -84,6 +94,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             { config, _ ->
                 (config as? OdooRunConfiguration)?.let {
                     odooBinField.text = it.odooBinFilePath
+                    databaseField.text = it.odooParametersDb ?: ""
                     addonsListModel.apply {
                         clear()
                         addAll(it.addonsPaths)
@@ -94,6 +105,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             { config, _ ->
                 (config as? OdooRunConfiguration)?.let {
                     it.odooBinFilePath = odooBinField.text
+                    it.odooParametersDb = databaseField.text
                     it.addonsPaths = addonsListModel.elements().toList()
                     it.odooParametersExtra = paramsEditor.text.trim()
                 }

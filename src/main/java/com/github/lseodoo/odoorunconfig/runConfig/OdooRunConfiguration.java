@@ -21,6 +21,9 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         @Attribute("odoo-bin-path")
         public String odooBinFilePath;
 
+        @Attribute("odoo-parameters-db")
+        public String odooParametersDb;
+
         @XCollection(elementName = "odoo-parmaters-addons-path")
         public List<String> odooParametersAddonsPath = new ArrayList<>();
 
@@ -51,16 +54,20 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
 
     @Override
     public String getScriptParameters() {
-        StringBuilder sb = new StringBuilder();
+        List<String> allOdooParams = new ArrayList<>();
 
-        sb.append(super.getScriptParameters());
-
-        if (!getAddonsPaths().isEmpty()) {
-            sb.append(" --addons-path=");
-            sb.append(String.join(",", getAddonsPaths()));
+        if (getOdooBinFilePath() != null) {
+            allOdooParams.add("-d");
+            allOdooParams.add(getOdooParametersDb());
         }
 
-        return sb.toString();
+        if (!getAddonsPaths().isEmpty()) {
+            allOdooParams.add("--addons-path="+String.join(",", getAddonsPaths()));
+        }
+
+        allOdooParams.add(super.getScriptParameters());
+
+        return String.join(" ", allOdooParams);
     }
 
     @Override
@@ -86,6 +93,8 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         myOdooState.odooBinFilePath = path;
         setScriptName(path);
     }
+    public String getOdooParametersDb() { return myOdooState.odooParametersDb; }
+    public void setOdooParametersDb(String odooParametersDb) { this.myOdooState.odooParametersDb = odooParametersDb; }
     public String getOdooParametersExtra() { return myOdooState.odooParametersExtra; }
     public void setOdooParametersExtra(String params) {
         myOdooState.odooParametersExtra = params;
