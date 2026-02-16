@@ -30,14 +30,9 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
         fragments.add(createOdooSettingsFragment())
     }
 
-    private fun createOdooSettingsFragment(): SettingsEditorFragment<PythonRunConfiguration, *> {
+    private fun createOdooSettingsFragment(): SettingsEditorFragment<PythonRunConfiguration, DialogPanel> {
 
-        // 1. Initialize our Swing Components
-        val odooBinField = TextFieldWithBrowseButton().apply {
-            addBrowseFolderListener(TextBrowseFolderListener(FileChooserDescriptorFactory.createSingleFileDescriptor()))
-            emptyText.text = "/home/.../odoo/odoo-bin"
-        }
-
+        // 1. Initialize Complex Platform Widgets (These stay as standard Swing components)
         val addonsListModel = DefaultListModel<String>()
         val addonsList = JBList(addonsListModel).apply {
             emptyText.text = "No addons path specified"
@@ -52,22 +47,35 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             TextComponentEmptyText.setupPlaceholderVisibility(editorField)
         }
 
-        // 2. Build the Layout Declaratively using Kotlin UI DSL v2
+        // We declare a variable to hold our pure-DSL text field so we can read/write to it later
+        lateinit var odooBinField: TextFieldWithBrowseButton
+
+        // 2. Build the Layout
         val settingsPanel = panel {
             group("Odoo Configuration") {
+
                 row("Path to 'odoo-bin':") {
-                    cell(odooBinField).align(AlignX.FILL)
+                    // PURE KOTLIN DSL: Using the modernized, non-deprecated signature
+                    textFieldWithBrowseButton(
+                        FileChooserDescriptorFactory.createSingleFileDescriptor().withTitle("Select odoo-bin File"),
+                        project = null
+                    ).applyToComponent {
+                        emptyText.text = "/home/.../odoo/odoo-bin"
+                        odooBinField = this
+                    }.align(AlignX.FILL)
                 }
+
                 row("Addons paths:") {
                     cell(addonsDecorator.createPanel()).align(AlignX.FILL)
                 }
+
                 row("Arbitrary parameters:") {
                     cell(paramsEditor).align(AlignX.FILL)
                 }
             }
         }
 
-        // 3. Return a single Fragment managing the whole panel
+        // 3. Return the Fragment
         return SettingsEditorFragment<PythonRunConfiguration, DialogPanel>(
             "odoo.script.settings",
             "Odoo Configuration",
@@ -75,7 +83,6 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             settingsPanel,
             SettingsEditorFragmentType.COMMAND_LINE,
             { config, _ ->
-                // RESET: Load from config into UI
                 (config as? OdooRunConfiguration)?.let {
                     odooBinField.text = it.odooBinFilePath
                     addonsListModel.apply {
@@ -86,7 +93,6 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
                 }
             },
             { config, _ ->
-                // APPLY: Save from UI into config
                 (config as? OdooRunConfiguration)?.let {
                     it.odooBinFilePath = odooBinField.text
                     it.addonsPaths = addonsListModel.elements().toList()
