@@ -1,6 +1,7 @@
 package com.github.lseodoo.odoorunconfig.common
 
 import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
+import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooser
@@ -15,6 +16,7 @@ import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.TextComponentEmptyText
 import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.DefaultListModel
 
@@ -39,6 +41,27 @@ class OdooRunConfigUI {
     // 1. The Shared UI Panel
     val panel: DialogPanel = panel {
         group("Odoo Configuration") {
+            row("Copy values from:") {
+                val templates = OdooSettingService.instance.getState().runTemplates
+                val odooRunTemplateComboBox = comboBox(templates.map { it.name })
+
+                button("Apply") {
+                    val selectedName = odooRunTemplateComboBox.component.selectedItem as? String
+                    val selectedTemplate = templates.find { it.name == selectedName }
+
+                    selectedTemplate?.runConfig?.let { tplConfig ->
+                        // Reuse our existing method to overwrite the UI fields instantly!
+                        resetFrom(
+                            tplConfig.odooBinFilePath,
+                            tplConfig.odooParametersDb,
+                            tplConfig.odooParametersAddonsPath as List<String>,
+                            tplConfig.odooParametersExtra
+                        )
+                    }
+                }
+            }.bottomGap(BottomGap.SMALL)
+            separator()
+
             row("Path to 'odoo-bin':") {
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.singleFile().withTitle("Select odoo-bin File"),
