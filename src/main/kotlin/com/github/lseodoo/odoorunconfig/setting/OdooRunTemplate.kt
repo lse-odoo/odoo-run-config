@@ -1,6 +1,6 @@
 package com.github.lseodoo.odoorunconfig.setting
 
-import com.github.lseodoo.odoorunconfig.state.OdooRunConfig
+import com.github.lseodoo.odoorunconfig.common.OdooRunConfig
 import com.intellij.util.ui.ColumnInfo
 
 data class OdooRunTemplate(

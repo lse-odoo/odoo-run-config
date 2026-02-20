@@ -1,6 +1,6 @@
 package com.github.lseodoo.odoorunconfig.setting
 
-import com.github.lseodoo.odoorunconfig.state.OdooRunConfig
+import com.github.lseodoo.odoorunconfig.common.OdooRunConfig
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.ui.dsl.builder.bindText

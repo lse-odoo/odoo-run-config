@@ -1,6 +1,5 @@
-package com.github.lseodoo.odoorunconfig.state
+package com.github.lseodoo.odoorunconfig.common
 
-import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.XCollection
 
