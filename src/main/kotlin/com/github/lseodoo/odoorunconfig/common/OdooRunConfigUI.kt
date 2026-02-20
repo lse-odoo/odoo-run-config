@@ -50,34 +50,34 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
                     nameField = this
                 }.align(AlignX.FILL)
             }
-            separator()
-        }
-
-        val availableTemplates = OdooSettingService.instance.state.runTemplates
-        if (availableTemplates.isNotEmpty()) {
-            row("Copy values from:") {
-                val comboBox = comboBox(availableTemplates.map { it.name })
-
-                button("Apply") {
-                    val selectedName = comboBox.component.selectedItem as? String
-                    val selectedTemplate = availableTemplates.find { it.name == selectedName }
-
-                    selectedTemplate?.runConfig?.let { tplConfig ->
-                        // Populate the fields (but intentionally DO NOT overwrite the nameField!)
-                        odooBinField.text = tplConfig.odooBinFilePath ?: ""
-                        databaseField.text = tplConfig.odooParametersDb ?: ""
-                        addonsListModel.apply {
-                            clear()
-                            addAll(tplConfig.odooParametersAddonsPath as List<String>)
-                        }
-                        paramsEditor.text = tplConfig.odooParametersExtra ?: ""
-                    }
-                }
-            }.bottomGap(BottomGap.SMALL)
-            separator()
         }
 
         group("Odoo Configuration") {
+
+            val availableTemplates = OdooSettingService.instance.state.runTemplates
+            if (availableTemplates.isNotEmpty()) {
+                row("Copy values from:") {
+                    val comboBox = comboBox(availableTemplates.map { it.name })
+
+                    button("Apply") {
+                        val selectedName = comboBox.component.selectedItem as? String
+                        val selectedTemplate = availableTemplates.find { it.name == selectedName }
+
+                        selectedTemplate?.runConfig?.let { tplConfig ->
+                            // Populate the fields (but intentionally DO NOT overwrite the nameField!)
+                            odooBinField.text = tplConfig.odooBinFilePath ?: ""
+                            databaseField.text = tplConfig.odooParametersDb ?: ""
+                            addonsListModel.apply {
+                                clear()
+                                addAll(tplConfig.odooParametersAddonsPath as List<String>)
+                            }
+                            paramsEditor.text = tplConfig.odooParametersExtra ?: ""
+                        }
+                    }
+                }.bottomGap(BottomGap.SMALL)
+                separator()
+            }
+
             row("Path to 'odoo-bin':") {
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.singleFile().withTitle("Select odoo-bin File"),
