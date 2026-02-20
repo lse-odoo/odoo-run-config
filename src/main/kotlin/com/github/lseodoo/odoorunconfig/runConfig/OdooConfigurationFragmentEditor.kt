@@ -16,7 +16,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
     }
 
     private fun createOdooSettingsFragment(): SettingsEditorFragment<PythonRunConfiguration, DialogPanel> {
-        val commonUi = OdooRunConfigUI()
+        val commonUi = OdooRunConfigUI(showTemplateNameField = false)
 
         return SettingsEditorFragment<PythonRunConfiguration, DialogPanel>(
             "odoo.script.settings",

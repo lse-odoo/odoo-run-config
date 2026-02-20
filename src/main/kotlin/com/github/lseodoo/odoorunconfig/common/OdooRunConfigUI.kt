@@ -1,6 +1,7 @@
 package com.github.lseodoo.odoorunconfig.common
 
-import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
+import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration // Update with your actual import
+import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.ide.macro.MacrosDialog
@@ -20,7 +21,13 @@ import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.DefaultListModel
 
-class OdooRunConfigUI {
+// Pass showNameField = false when using this inside your Run Configuration Fragment!
+class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
+
+    lateinit var nameField: JBTextField
+    lateinit var odooBinField: TextFieldWithBrowseButton
+    lateinit var databaseField: JBTextField
+
     val addonsListModel = DefaultListModel<String>()
     val addonsList = JBList(addonsListModel).apply {
         emptyText.text = "No addons path specified"
@@ -28,40 +35,49 @@ class OdooRunConfigUI {
     }
 
     val paramsEditor = RawCommandLineEditor().apply {
-        // Adjust MIN_FRAGMENT_WIDTH or remove this line if it's specific to the fragment
         CommandLinePanel.setMinimumWidth(this, 400)
         MacrosDialog.addMacroSupport(editorField, MacrosDialog.Filters.ALL) { false }
         editorField.emptyText.text = "-i crm -u account,stock ..."
         TextComponentEmptyText.setupPlaceholderVisibility(editorField)
     }
 
-    lateinit var odooBinField: TextFieldWithBrowseButton
-    lateinit var databaseField: JBTextField
-
-    // 1. The Shared UI Panel
     val panel: DialogPanel = panel {
-        group("Odoo Configuration") {
+        // Only show the name field in the Settings window, not in Run Configurations
+        if (showTemplateNameField) {
+            row("Template name:") {
+                textField().applyToComponent {
+                    emptyText.text = "e.g., Odoo 18 Production"
+                    nameField = this
+                }.align(AlignX.FILL)
+            }
+            separator()
+        }
+
+        val availableTemplates = OdooSettingService.instance.state.runTemplates
+        if (availableTemplates.isNotEmpty()) {
             row("Copy values from:") {
-                val templates = OdooSettingService.instance.getState().runTemplates
-                val odooRunTemplateComboBox = comboBox(templates.map { it.name })
+                val comboBox = comboBox(availableTemplates.map { it.name })
 
                 button("Apply") {
-                    val selectedName = odooRunTemplateComboBox.component.selectedItem as? String
-                    val selectedTemplate = templates.find { it.name == selectedName }
+                    val selectedName = comboBox.component.selectedItem as? String
+                    val selectedTemplate = availableTemplates.find { it.name == selectedName }
 
                     selectedTemplate?.runConfig?.let { tplConfig ->
-                        // Reuse our existing method to overwrite the UI fields instantly!
-                        resetFrom(
-                            tplConfig.odooBinFilePath,
-                            tplConfig.odooParametersDb,
-                            tplConfig.odooParametersAddonsPath as List<String>,
-                            tplConfig.odooParametersExtra
-                        )
+                        // Populate the fields (but intentionally DO NOT overwrite the nameField!)
+                        odooBinField.text = tplConfig.odooBinFilePath ?: ""
+                        databaseField.text = tplConfig.odooParametersDb ?: ""
+                        addonsListModel.apply {
+                            clear()
+                            addAll(tplConfig.odooParametersAddonsPath as List<String>)
+                        }
+                        paramsEditor.text = tplConfig.odooParametersExtra ?: ""
                     }
                 }
             }.bottomGap(BottomGap.SMALL)
             separator()
+        }
 
+        group("Odoo Configuration") {
             row("Path to 'odoo-bin':") {
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.singleFile().withTitle("Select odoo-bin File"),
@@ -90,8 +106,13 @@ class OdooRunConfigUI {
         }
     }
 
-    // 2. Populate the UI from existing data
-    fun resetFrom(binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
+    // --- Data Binding Methods ---
+
+    // 1. Load data into the UI
+    fun resetFrom(name: String, binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
+        if (showTemplateNameField) {
+            nameField.text = name
+        }
         odooBinField.text = binPath ?: ""
         databaseField.text = dbName ?: ""
         addonsListModel.apply {
@@ -101,20 +122,31 @@ class OdooRunConfigUI {
         paramsEditor.text = extraParams ?: ""
     }
 
-    // 3A. Write UI data to the Settings Template
-    fun applyTo(config: OdooRunConfig) {
-        config.odooBinFilePath = odooBinField.text.ifBlank { null }
-        config.odooParametersDb = databaseField.text.ifBlank { null }
-        config.odooParametersAddonsPath = addonsListModel.elements().toList().toMutableList()
-        config.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
+    fun resetFrom(binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
+        // Just call the main method and pass an empty string for the name
+        resetFrom("", binPath, dbName, addons, extraParams)
     }
 
-    // 3B. Write UI data to the Run Configuration
-    fun applyTo(runConfig: OdooRunConfiguration) { // Assuming this is your actual RunConfig class
-        applyTo(runConfig.myOdooRunConfig)
+    // 2. Save data from UI to an OdooRunTemplate (Used in Settings)
+    fun applyTo(template: OdooRunTemplate) {
+        if (showTemplateNameField) {
+            template.name = nameField.text.ifBlank { "Unnamed Template" }
+        }
+        template.runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
+        template.runConfig.odooParametersDb = databaseField.text.ifBlank { null }
+        template.runConfig.odooParametersAddonsPath = addonsListModel.elements().toList().toMutableList()
+        template.runConfig.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
     }
 
-    // Extracted decorator logic
+    // 3. Save data from UI to an active Run Configuration (Used in Fragments)
+    fun applyTo(runConfig: OdooRunConfiguration) {
+        runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
+        runConfig.odooParametersDb = databaseField.text.ifBlank { null }
+        runConfig.addonsPaths = addonsListModel.elements().toList().toMutableList()
+        runConfig.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
+    }
+
+    // --- Toolbar Helper ---
     private fun createAddonsDecorator(): ToolbarDecorator {
         return ToolbarDecorator.createDecorator(addonsList)
             .setAddAction {
