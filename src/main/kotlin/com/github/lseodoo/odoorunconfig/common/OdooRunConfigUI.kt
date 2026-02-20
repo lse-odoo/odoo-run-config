@@ -1,13 +1,16 @@
 package com.github.lseodoo.odoorunconfig.common
 
 import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration // Update with your actual import
+import com.github.lseodoo.odoorunconfig.setting.OdooConfigurable
 import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.emptyText
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -21,8 +24,19 @@ import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.DefaultListModel
 
-// Pass showNameField = false when using this inside your Run Configuration Fragment!
-class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
+/**
+ * A user interface class for configuring Odoo run configurations in both Run/Debug Configuration dialogs
+ * and Settings panels. This class provides fields for setting Odoo-specific configuration such as
+ * the path to the `odoo-bin` file, database name, addons paths, and additional parameters.
+ *
+ * @constructor
+ * Initializes the user interface and layout definition. Depending on the context, either opens in a
+ * Settings window or Run/Debug Configuration window.
+ *
+ * @param isOpenFromSetting Determines whether the UI is opened from the Settings window or the Run/Debug
+ * Configuration window.
+ */
+class OdooRunConfigUI(private val isOpenFromSetting: Boolean = true) {
 
     lateinit var nameField: JBTextField
     lateinit var odooBinField: TextFieldWithBrowseButton
@@ -43,7 +57,7 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
 
     val panel: DialogPanel = panel {
         // Only show the name field in the Settings window, not in Run Configurations
-        if (showTemplateNameField) {
+        if (isOpenFromSetting) {
             row("Template name:") {
                 textField().applyToComponent {
                     emptyText.text = "e.g., Odoo 18 Production"
@@ -55,8 +69,9 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
         group("Odoo Configuration") {
 
             val availableTemplates = OdooSettingService.instance.state.runTemplates
-            if (availableTemplates.isNotEmpty()) {
-                row("Copy values from:") {
+            row("Templates:") {
+                // Only show the ComboBox and Apply button if there are templates to apply
+                if (availableTemplates.isNotEmpty()) {
                     val comboBox = comboBox(availableTemplates.map { it.name })
 
                     button("Apply") {
@@ -64,7 +79,6 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
                         val selectedTemplate = availableTemplates.find { it.name == selectedName }
 
                         selectedTemplate?.runConfig?.let { tplConfig ->
-                            // Populate the fields (but intentionally DO NOT overwrite the nameField!)
                             odooBinField.text = tplConfig.odooBinFilePath ?: ""
                             databaseField.text = tplConfig.odooParametersDb ?: ""
                             addonsListModel.apply {
@@ -74,9 +88,33 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
                             paramsEditor.text = tplConfig.odooParametersExtra ?: ""
                         }
                     }
-                }.bottomGap(BottomGap.SMALL)
-                separator()
-            }
+                }
+                if (!isOpenFromSetting) {
+                    // The Shortcut Link -> Opens your Settings Page
+                    link(if (availableTemplates.isNotEmpty()) "Manage..." else "Create template...") {
+                        ShowSettingsUtil.getInstance().showSettingsDialog(null, OdooConfigurable::class.java)
+                    }
+
+                    // The Save Button -> Captures current UI instantly
+                    button("Save Current as Template...") {
+                        // Ask the user for a name
+                        val templateName = Messages.showInputDialog(
+                            panel,
+                            "Enter a name for the new template:",
+                            "Save Template",
+                            null
+                        )
+
+                        if (!templateName.isNullOrBlank()) {
+                            // Create the new template
+                            val newTemplate = OdooRunTemplate(name = templateName as String)
+                            applyTo(newTemplate)
+                            OdooSettingService.instance.state.runTemplates.add(newTemplate)
+                        }
+                    }
+                }
+            }.bottomGap(BottomGap.SMALL)
+            separator()
 
             row("Path to 'odoo-bin':") {
                 textFieldWithBrowseButton(
@@ -110,7 +148,7 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
 
     // 1. Load data into the UI
     fun resetFrom(name: String, binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
-        if (showTemplateNameField) {
+        if (isOpenFromSetting) {
             nameField.text = name
         }
         odooBinField.text = binPath ?: ""
@@ -129,7 +167,7 @@ class OdooRunConfigUI(private val showTemplateNameField: Boolean = true) {
 
     // 2. Save data from UI to an OdooRunTemplate (Used in Settings)
     fun applyTo(template: OdooRunTemplate) {
-        if (showTemplateNameField) {
+        if (isOpenFromSetting) {
             template.name = nameField.text.ifBlank { "Unnamed Template" }
         }
         template.runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
