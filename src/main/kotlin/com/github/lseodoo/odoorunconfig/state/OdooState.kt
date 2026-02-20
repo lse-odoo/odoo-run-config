@@ -20,7 +20,3 @@ data class OdooRunConfig(
     @Attribute("odoo-parameters-extra")
     var odooParametersExtra: String? = null,
 )
-
-data class OdooState(
-    var runTemplates: MutableList<OdooRunTemplate> = mutableListOf()
-)

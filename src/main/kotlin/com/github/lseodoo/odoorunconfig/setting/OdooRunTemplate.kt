@@ -22,3 +22,7 @@ class VersionColumn : ColumnInfo<OdooRunTemplate, String>("Version") {
     override fun setValue(item: OdooRunTemplate, value: String) { item.version = value }
     override fun isCellEditable(item: OdooRunTemplate): Boolean = true
 }
+
+data class OdooState(
+    var runTemplates: MutableList<OdooRunTemplate> = mutableListOf()
+)

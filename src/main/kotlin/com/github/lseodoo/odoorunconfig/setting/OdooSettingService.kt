@@ -1,6 +1,5 @@
 package com.github.lseodoo.odoorunconfig.setting
 
-import com.github.lseodoo.odoorunconfig.state.OdooState
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.Service
@@ -14,12 +13,12 @@ import com.intellij.openapi.components.Storage
     storages = [Storage("odoo-settings.xml")]
 )
 class OdooSettingService : PersistentStateComponent<OdooState> {
-    private var myState = OdooState()
+    private var odooState = OdooState()
 
-    override fun getState(): OdooState = myState
+    override fun getState(): OdooState = odooState
 
     override fun loadState(state: OdooState) {
-        myState = state
+        odooState = state
     }
 
     companion object {
