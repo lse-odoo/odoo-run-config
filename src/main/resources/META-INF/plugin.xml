@@ -23,5 +23,10 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <configurationType implementation="com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfigurationType"/>
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.github.lseodoo.odoorunconfig.setting.OdooConfigurable"
+                id="com.yourdomain.plugin.OdooConfigurable"
+                displayName="Odoo"/>
     </extensions>
 </idea-plugin>
