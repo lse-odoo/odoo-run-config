@@ -15,7 +15,7 @@ import java.util.List;
 
 public class OdooRunConfiguration extends PythonRunConfiguration {
 
-    private final OdooRunConfig myOdooRunConfig = new OdooRunConfig();
+    public final OdooRunConfig myOdooRunConfig = new OdooRunConfig();
 
     public OdooRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory);
