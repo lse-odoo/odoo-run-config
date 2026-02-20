@@ -33,6 +33,25 @@ class OdooConfigurable : BoundConfigurable("Odoo Settings") {
                                 odooRunTemplateTableModel.removeRow(index)
                             }
                         }
+                        .setEditAction {
+                            // 1. Get the currently selected row
+                            val selectedRow = odooRunTemplateTable.selectedRow
+                            if (selectedRow >= 0) {
+                                val selectedTemplate = odooRunTemplateTableModel.getItem(selectedRow)
+
+                                // 2. Open the pop-up dialog, passing the nested runConfig
+                                val dialog = OdooRunTemplateDialog(selectedTemplate.runConfig)
+
+                                // 3. showAndGet() returns true if the user clicked "OK"
+                                if (dialog.showAndGet()) {
+                                    // Update the original object with the modified copy
+                                    selectedTemplate.runConfig = dialog.workingCopy
+
+                                    // Tell the table model that the row was updated
+                                    odooRunTemplateTableModel.fireTableRowsUpdated(selectedRow, selectedRow)
+                                }
+                            }
+                        }
 
                     cell(decorator.createPanel())
                         .align(Align.FILL)
