@@ -1,6 +1,5 @@
-package com.github.lseodoo.odoorunconfig.runConig
+package com.github.lseodoo.odoorunconfig.runConfig
 
-import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.execution.ui.SettingsEditorFragment
 import com.intellij.execution.ui.SettingsEditorFragmentType

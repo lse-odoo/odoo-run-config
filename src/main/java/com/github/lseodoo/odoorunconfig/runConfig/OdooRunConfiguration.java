@@ -1,6 +1,5 @@
 package com.github.lseodoo.odoorunconfig.runConfig;
 
-import com.github.lseodoo.odoorunconfig.runConig.OdooConfigurationFragmentEditor;
 import com.github.lseodoo.odoorunconfig.state.OdooState;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
