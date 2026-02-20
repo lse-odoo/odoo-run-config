@@ -1,12 +1,13 @@
 package com.github.lseodoo.odoorunconfig.state
 
+import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.intellij.util.xmlb.annotations.Attribute
 import com.intellij.util.xmlb.annotations.XCollection
 
 /**
  * Basic Odoo state with low-level information useful for any Odoo run configuration.
  */
-data class OdooState(
+data class OdooRunConfig(
     @Attribute("odoo-bin-path")
     var odooBinFilePath: String? = null,
 
@@ -18,4 +19,8 @@ data class OdooState(
 
     @Attribute("odoo-parameters-extra")
     var odooParametersExtra: String? = null,
+)
+
+data class OdooState(
+    var runTemplates: MutableList<OdooRunTemplate> = mutableListOf()
 )

@@ -1,6 +1,6 @@
 package com.github.lseodoo.odoorunconfig.runConfig;
 
-import com.github.lseodoo.odoorunconfig.state.OdooState;
+import com.github.lseodoo.odoorunconfig.state.OdooRunConfig;
 import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.execution.configurations.RuntimeConfigurationException;
 import com.intellij.openapi.options.SettingsEditor;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class OdooRunConfiguration extends PythonRunConfiguration {
 
-    private final OdooState myOdooState = new OdooState();
+    private final OdooRunConfig myOdooRunConfig = new OdooRunConfig();
 
     public OdooRunConfiguration(Project project, ConfigurationFactory factory, String name) {
         super(project, factory);
@@ -72,18 +72,18 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         return new OdooConfigurationFragmentEditor(this);
     }
 
-    public String getOdooBinFilePath() { return myOdooState.getOdooBinFilePath(); }
+    public String getOdooBinFilePath() { return myOdooRunConfig.getOdooBinFilePath(); }
     public void setOdooBinFilePath(String path) {
-        myOdooState.setOdooBinFilePath(path);
+        myOdooRunConfig.setOdooBinFilePath(path);
         setScriptName(path);
     }
-    public String getOdooParametersDb() { return myOdooState.getOdooParametersDb(); }
-    public void setOdooParametersDb(String odooParametersDb) { this.myOdooState.setOdooParametersDb(odooParametersDb); }
-    public String getOdooParametersExtra() { return myOdooState.getOdooParametersExtra(); }
+    public String getOdooParametersDb() { return myOdooRunConfig.getOdooParametersDb(); }
+    public void setOdooParametersDb(String odooParametersDb) { this.myOdooRunConfig.setOdooParametersDb(odooParametersDb); }
+    public String getOdooParametersExtra() { return myOdooRunConfig.getOdooParametersExtra(); }
     public void setOdooParametersExtra(String params) {
-        myOdooState.setOdooParametersExtra(params);
+        myOdooRunConfig.setOdooParametersExtra(params);
         setScriptParameters(params);
     }
-    public List<String> getAddonsPaths() { return myOdooState.getOdooParametersAddonsPath(); }
-    public void setAddonsPaths(List<String> paths) { myOdooState.setOdooParametersAddonsPath(paths); }
+    public List<String> getAddonsPaths() { return myOdooRunConfig.getOdooParametersAddonsPath(); }
+    public void setAddonsPaths(List<String> paths) { myOdooRunConfig.setOdooParametersAddonsPath(paths); }
 }
