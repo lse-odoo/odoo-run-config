@@ -2,6 +2,7 @@ package com.github.lseodoo.odoorunconfig.common
 
 import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
 import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
+import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.DialogPanel
@@ -13,21 +14,22 @@ import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
+import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.DefaultListModel
 
+
 /**
- * A user interface class for configuring Odoo run configurations in both Run/Debug Configuration dialogs
- * and Settings panels. This class provides fields for setting Odoo-specific configuration such as
- * the path to the `odoo-bin` file, database name, addons paths, and additional parameters.
+ * Abstract base class for creating a panel used to configure and manage Odoo run configurations.
+ * This class defines common components and standard UI layout while allowing subclasses to implement
+ * specific custom header and post-template sections via abstract methods.
  *
- * @constructor
- * Initializes the user interface and layout definition. Depending on the context, either opens in a
- * Settings window or Run/Debug Configuration window.
- *
- * @param isOpenFromSetting Determines whether the UI is opened from the Settings window or the Run/Debug
- * Configuration window.
+ * Key functionalities include:
+ * - Managing fields for Odoo binary path, database name, addons paths, and additional parameters.
+ * - Providing methods to reset data into the UI and apply data from the UI to various configurations.
+ * - Supporting customization of the panel with additional headers and post-template elements implemented by subclasses.
  */
 abstract class AbstractOdooRunPanel {
 
@@ -44,7 +46,28 @@ abstract class AbstractOdooRunPanel {
         buildHeader()
 
         group("Odoo Configuration") {
-            buildTemplateManagement()
+            row("Templates:") {
+                val availableTemplates = OdooSettingService.instance.state.runTemplates
+                if (availableTemplates.isNotEmpty()) {
+                    val comboBox = comboBox(availableTemplates.map { it.name })
+
+                    button("Apply") {
+                        val selectedName = comboBox.component.selectedItem as? String
+                        val selectedTemplate = availableTemplates.find { it.name == selectedName }
+
+                        selectedTemplate?.runConfig?.let { tplConfig ->
+                            odooBinField.text = tplConfig.odooBinFilePath ?: ""
+                            databaseField.text = tplConfig.odooParametersDb ?: ""
+                            addonsListModel.apply {
+                                clear()
+                                addAll(tplConfig.odooParametersAddonsPath as List<String>)
+                            }
+                            paramsEditor.text = tplConfig.odooParametersExtra ?: ""
+                        }
+                    }
+                }
+                buildPostTemplate()
+            }.bottomGap(BottomGap.SMALL)
             separator()
 
             // 4. Le reste du layout est commun et reste ici
@@ -76,9 +99,11 @@ abstract class AbstractOdooRunPanel {
         }
     }
 
+
     // 5. Les "trous" que les classes enfants devront implémenter
     abstract fun Panel.buildHeader()
-    abstract fun Panel.buildTemplateManagement()
+    abstract fun Row.buildPostTemplate()
+
 
     // --- Data Binding Methods ---
 

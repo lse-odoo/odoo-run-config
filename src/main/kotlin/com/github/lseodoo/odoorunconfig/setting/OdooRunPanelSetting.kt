@@ -4,6 +4,7 @@ import com.github.lseodoo.odoorunconfig.common.AbstractOdooRunPanel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.Row
 
 class OdooRunPanelSetting: AbstractOdooRunPanel() {
     lateinit var nameField: JBTextField
@@ -17,5 +18,5 @@ class OdooRunPanelSetting: AbstractOdooRunPanel() {
         }
     }
 
-    override fun Panel.buildTemplateManagement() {}
+    override fun Row.buildPostTemplate() {}
 }
