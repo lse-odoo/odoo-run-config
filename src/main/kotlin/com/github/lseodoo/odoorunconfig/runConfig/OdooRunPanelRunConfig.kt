@@ -12,8 +12,6 @@ import com.intellij.ui.dsl.builder.Row
 
 
 class OdooRunPanelRunConfig : AbstractOdooRunPanel() {
-    override fun Panel.buildHeader() {}
-
     override fun Row.buildPostTemplate() {
         // The Shortcut Link -> Opens your Settings Page
         link("Configure...") {
@@ -32,7 +30,7 @@ class OdooRunPanelRunConfig : AbstractOdooRunPanel() {
 
             if (!templateName.isNullOrBlank()) {
                 // Create the new template
-                val newTemplate = OdooRunTemplate(name = templateName as String)
+                val newTemplate = OdooRunTemplate(name = templateName)
                 applyTo(newTemplate)
                 OdooSettingService.instance.state.runTemplates.add(newTemplate)
             }

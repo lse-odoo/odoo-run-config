@@ -3,6 +3,8 @@ package com.github.lseodoo.odoorunconfig.common
 import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
 import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
+import com.intellij.execution.ui.CommandLinePanel
+import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.DialogPanel
@@ -13,6 +15,7 @@ import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.components.TextComponentEmptyText
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.BottomGap
 import com.intellij.ui.dsl.builder.Panel
@@ -33,16 +36,21 @@ import javax.swing.DefaultListModel
  */
 abstract class AbstractOdooRunPanel {
 
-    // 1. Tous les composants communs sont définis ici
     lateinit var odooBinField: TextFieldWithBrowseButton
     lateinit var databaseField: JBTextField
     val addonsListModel = DefaultListModel<String>()
-    val addonsList = JBList(addonsListModel).apply { /* ... */ }
-    val paramsEditor = RawCommandLineEditor().apply { /* ... */ }
+    val addonsList = JBList(addonsListModel).apply {
+        emptyText.text = "No addons path specified"
+        visibleRowCount = 4
+    }
+    val paramsEditor = RawCommandLineEditor().apply {
+        CommandLinePanel.setMinimumWidth(this, 400)
+        MacrosDialog.addMacroSupport(editorField, MacrosDialog.Filters.ALL) { false }
+        editorField.emptyText.text = "-i crm -u account,stock ..."
+        TextComponentEmptyText.setupPlaceholderVisibility(editorField)
+    }
 
-    // 2. Le panel principal est construit ici
     val panel: DialogPanel = panel {
-        // 3. On appelle les méthodes abstraites comme des "trous" à remplir
         buildHeader()
 
         group("Odoo Configuration") {
@@ -70,7 +78,6 @@ abstract class AbstractOdooRunPanel {
             }.bottomGap(BottomGap.SMALL)
             separator()
 
-            // 4. Le reste du layout est commun et reste ici
             row("Path to 'odoo-bin':") {
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.singleFile().withTitle("Select odoo-bin File"),
@@ -100,14 +107,12 @@ abstract class AbstractOdooRunPanel {
     }
 
 
-    // 5. Les "trous" que les classes enfants devront implémenter
-    abstract fun Panel.buildHeader()
-    abstract fun Row.buildPostTemplate()
+    open fun Panel.buildHeader() {}
+    open fun Row.buildPostTemplate() {}
 
 
     // --- Data Binding Methods ---
 
-    // 1. Load data into the UI
     fun resetFrom(name: String, binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
         odooBinField.text = binPath ?: ""
         databaseField.text = dbName ?: ""
@@ -123,7 +128,7 @@ abstract class AbstractOdooRunPanel {
         resetFrom("", binPath, dbName, addons, extraParams)
     }
 
-    // 2. Save data from UI to an OdooRunTemplate (Used in Settings)
+    // Save data from UI to an OdooRunTemplate (Used in Settings)
     fun applyTo(template: OdooRunTemplate) {
         template.runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
         template.runConfig.odooParametersDb = databaseField.text.ifBlank { null }
@@ -131,7 +136,7 @@ abstract class AbstractOdooRunPanel {
         template.runConfig.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
     }
 
-    // 3. Save data from UI to an active Run Configuration (Used in Fragments)
+    // Save data from UI to an active Run Configuration (Used in Fragments)
     fun applyTo(runConfig: OdooRunConfiguration) {
         runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
         runConfig.odooParametersDb = databaseField.text.ifBlank { null }

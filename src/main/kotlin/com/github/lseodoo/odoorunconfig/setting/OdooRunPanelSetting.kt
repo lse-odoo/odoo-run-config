@@ -17,6 +17,4 @@ class OdooRunPanelSetting: AbstractOdooRunPanel() {
             }.align(AlignX.FILL)
         }
     }
-
-    override fun Row.buildPostTemplate() {}
 }
