@@ -1,16 +1,10 @@
 package com.github.lseodoo.odoorunconfig.common
 
-import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration // Update with your actual import
-import com.github.lseodoo.odoorunconfig.setting.OdooConfigurable
+import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
 import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
-import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
-import com.intellij.execution.ui.CommandLinePanel
-import com.intellij.ide.macro.MacrosDialog
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.ui.emptyText
 import com.intellij.openapi.vfs.LocalFileSystem
@@ -18,9 +12,8 @@ import com.intellij.ui.RawCommandLineEditor
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.components.TextComponentEmptyText
 import com.intellij.ui.dsl.builder.AlignX
-import com.intellij.ui.dsl.builder.BottomGap
+import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.panel
 import javax.swing.DefaultListModel
 
@@ -36,86 +29,25 @@ import javax.swing.DefaultListModel
  * @param isOpenFromSetting Determines whether the UI is opened from the Settings window or the Run/Debug
  * Configuration window.
  */
-class OdooRunConfigUI(private val isOpenFromSetting: Boolean = true) {
+abstract class AbstractOdooRunPanel {
 
-    lateinit var nameField: JBTextField
+    // 1. Tous les composants communs sont définis ici
     lateinit var odooBinField: TextFieldWithBrowseButton
     lateinit var databaseField: JBTextField
-
     val addonsListModel = DefaultListModel<String>()
-    val addonsList = JBList(addonsListModel).apply {
-        emptyText.text = "No addons path specified"
-        visibleRowCount = 4
-    }
+    val addonsList = JBList(addonsListModel).apply { /* ... */ }
+    val paramsEditor = RawCommandLineEditor().apply { /* ... */ }
 
-    val paramsEditor = RawCommandLineEditor().apply {
-        CommandLinePanel.setMinimumWidth(this, 400)
-        MacrosDialog.addMacroSupport(editorField, MacrosDialog.Filters.ALL) { false }
-        editorField.emptyText.text = "-i crm -u account,stock ..."
-        TextComponentEmptyText.setupPlaceholderVisibility(editorField)
-    }
-
+    // 2. Le panel principal est construit ici
     val panel: DialogPanel = panel {
-        // Only show the name field in the Settings window, not in Run Configurations
-        if (isOpenFromSetting) {
-            row("Template name:") {
-                textField().applyToComponent {
-                    emptyText.text = "e.g., Odoo 18 Production"
-                    nameField = this
-                }.align(AlignX.FILL)
-            }
-        }
+        // 3. On appelle les méthodes abstraites comme des "trous" à remplir
+        buildHeader()
 
         group("Odoo Configuration") {
-
-            val availableTemplates = OdooSettingService.instance.state.runTemplates
-            row("Templates:") {
-                // Only show the ComboBox and Apply button if there are templates to apply
-                if (availableTemplates.isNotEmpty()) {
-                    val comboBox = comboBox(availableTemplates.map { it.name })
-
-                    button("Apply") {
-                        val selectedName = comboBox.component.selectedItem as? String
-                        val selectedTemplate = availableTemplates.find { it.name == selectedName }
-
-                        selectedTemplate?.runConfig?.let { tplConfig ->
-                            odooBinField.text = tplConfig.odooBinFilePath ?: ""
-                            databaseField.text = tplConfig.odooParametersDb ?: ""
-                            addonsListModel.apply {
-                                clear()
-                                addAll(tplConfig.odooParametersAddonsPath as List<String>)
-                            }
-                            paramsEditor.text = tplConfig.odooParametersExtra ?: ""
-                        }
-                    }
-                }
-                if (!isOpenFromSetting) {
-                    // The Shortcut Link -> Opens your Settings Page
-                    link(if (availableTemplates.isNotEmpty()) "Manage..." else "Create template...") {
-                        ShowSettingsUtil.getInstance().showSettingsDialog(null, OdooConfigurable::class.java)
-                    }
-
-                    // The Save Button -> Captures current UI instantly
-                    button("Save Current as Template...") {
-                        // Ask the user for a name
-                        val templateName = Messages.showInputDialog(
-                            panel,
-                            "Enter a name for the new template:",
-                            "Save Template",
-                            null
-                        )
-
-                        if (!templateName.isNullOrBlank()) {
-                            // Create the new template
-                            val newTemplate = OdooRunTemplate(name = templateName as String)
-                            applyTo(newTemplate)
-                            OdooSettingService.instance.state.runTemplates.add(newTemplate)
-                        }
-                    }
-                }
-            }.bottomGap(BottomGap.SMALL)
+            buildTemplateManagement()
             separator()
 
+            // 4. Le reste du layout est commun et reste ici
             row("Path to 'odoo-bin':") {
                 textFieldWithBrowseButton(
                     FileChooserDescriptorFactory.singleFile().withTitle("Select odoo-bin File"),
@@ -144,13 +76,14 @@ class OdooRunConfigUI(private val isOpenFromSetting: Boolean = true) {
         }
     }
 
+    // 5. Les "trous" que les classes enfants devront implémenter
+    abstract fun Panel.buildHeader()
+    abstract fun Panel.buildTemplateManagement()
+
     // --- Data Binding Methods ---
 
     // 1. Load data into the UI
     fun resetFrom(name: String, binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
-        if (isOpenFromSetting) {
-            nameField.text = name
-        }
         odooBinField.text = binPath ?: ""
         databaseField.text = dbName ?: ""
         addonsListModel.apply {
@@ -167,9 +100,6 @@ class OdooRunConfigUI(private val isOpenFromSetting: Boolean = true) {
 
     // 2. Save data from UI to an OdooRunTemplate (Used in Settings)
     fun applyTo(template: OdooRunTemplate) {
-        if (isOpenFromSetting) {
-            template.name = nameField.text.ifBlank { "Unnamed Template" }
-        }
         template.runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
         template.runConfig.odooParametersDb = databaseField.text.ifBlank { null }
         template.runConfig.odooParametersAddonsPath = addonsListModel.elements().toList().toMutableList()

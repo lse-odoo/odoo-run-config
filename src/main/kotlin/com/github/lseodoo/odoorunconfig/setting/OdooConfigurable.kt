@@ -1,6 +1,5 @@
 package com.github.lseodoo.odoorunconfig.setting
 
-import com.github.lseodoo.odoorunconfig.common.OdooRunConfigUI
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.ui.JBSplitter
@@ -26,7 +25,7 @@ class OdooConfigurable : BoundConfigurable("Odoo Settings") {
     }
 
     // Instantiate the shared UI for the Detail view (defaults to showNameField = true)
-    private val commonUi = OdooRunConfigUI()
+    private val commonUi = OdooRunPanelSetting()
 
     // Track the previously selected index to save its state before switching
     private var lastSelectedIndex = -1

@@ -1,6 +1,5 @@
 package com.github.lseodoo.odoorunconfig.runConfig
 
-import com.github.lseodoo.odoorunconfig.common.OdooRunConfigUI
 import com.intellij.execution.ui.SettingsEditorFragment
 import com.intellij.execution.ui.SettingsEditorFragmentType
 import com.intellij.openapi.ui.DialogPanel
@@ -16,7 +15,7 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
     }
 
     private fun createOdooSettingsFragment(): SettingsEditorFragment<PythonRunConfiguration, DialogPanel> {
-        val commonUi = OdooRunConfigUI(isOpenFromSetting = false)
+        val commonUi = OdooRunPanelRunConfig()
 
         return SettingsEditorFragment<PythonRunConfiguration, DialogPanel>(
             "odoo.script.settings",
