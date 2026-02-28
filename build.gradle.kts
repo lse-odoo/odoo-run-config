@@ -36,9 +36,9 @@ dependencies {
 
     // IntelliJ Platform Gradle Plugin Dependencies Extension - read more: https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-dependencies-extension.html
     intellijPlatform {
-        bundledPlugin("com.intellij.modules.python")
-
         pycharmCommunity(providers.gradleProperty("platformVersion"))
+
+        bundledPlugins("PythonCore")
 
         // Plugin Dependencies. Uses `platformBundledPlugins` property from the gradle.properties file for bundled IntelliJ Platform plugins.
         bundledPlugins(providers.gradleProperty("platformBundledPlugins").map { it.split(',') })
@@ -106,7 +106,12 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            recommended()
+            // recommended()
+            select {
+                types = listOf(org.jetbrains.intellij.platform.gradle.IntelliJPlatformType.PyCharmCommunity)
+                channels = listOf(org.jetbrains.intellij.platform.gradle.models.ProductRelease.Channel.RELEASE)
+                sinceBuild = providers.gradleProperty("pluginSinceBuild").get()
+            }
         }
     }
 }

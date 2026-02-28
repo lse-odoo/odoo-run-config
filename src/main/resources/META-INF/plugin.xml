@@ -3,11 +3,12 @@
     <id>com.github.lseodoo.odoorunconfig</id>
     <name>Odoo Run Configuration</name>
     <vendor>lse-odoo</vendor>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <!-- Please update the since-build and until-build attributes as needed -->
     <idea-version since-build="252" />
 
+    <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.python</depends>
 
     <description><![CDATA[
