@@ -6,8 +6,6 @@ import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.ui.Messages
-import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.Panel
 import com.intellij.ui.dsl.builder.Row
 
 

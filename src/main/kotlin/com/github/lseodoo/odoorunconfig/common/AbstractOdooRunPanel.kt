@@ -1,7 +1,5 @@
 package com.github.lseodoo.odoorunconfig.common
 
-import com.github.lseodoo.odoorunconfig.runConfig.OdooRunConfiguration
-import com.github.lseodoo.odoorunconfig.setting.OdooRunTemplate
 import com.github.lseodoo.odoorunconfig.setting.OdooSettingService
 import com.intellij.execution.ui.CommandLinePanel
 import com.intellij.ide.macro.MacrosDialog
@@ -16,11 +14,7 @@ import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.TextComponentEmptyText
-import com.intellij.ui.dsl.builder.AlignX
-import com.intellij.ui.dsl.builder.BottomGap
-import com.intellij.ui.dsl.builder.Panel
-import com.intellij.ui.dsl.builder.Row
-import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.*
 import javax.swing.DefaultListModel
 
 
