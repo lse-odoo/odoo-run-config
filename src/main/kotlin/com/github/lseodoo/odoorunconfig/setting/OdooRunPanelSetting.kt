@@ -1,7 +1,6 @@
 package com.github.lseodoo.odoorunconfig.setting
 
 import com.github.lseodoo.odoorunconfig.common.AbstractOdooRunPanel
-import com.github.lseodoo.odoorunconfig.common.OdooRunConfig
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Panel
