@@ -11,7 +11,9 @@
     <depends>com.intellij.modules.python</depends>
 
     <description><![CDATA[
-    Simple PyCharm plugin to handle Odoo run configuration
+    Streamline your Odoo development workflow in PyCharm with a dedicated run configuration type.
+    Stop manually setting up generic Python scripts for every project. This plugin provides a specialized "Odoo" run configuration with dedicated fields for the odoo-bin executable, database name, addons paths, and other common parameters.
+    Features include a user-friendly list editor for managing addons paths and a powerful template system to save and reuse your common configurations across projects.
     ]]></description>
 
     <change-notes><![CDATA[

@@ -18,11 +18,27 @@
 - [ ] Configure the [CODECOV_TOKEN](https://docs.codecov.com/docs/quick-start) secret for automated test coverage reports on PRs
 
 <!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
+Supercharge your Odoo development workflow in PyCharm and IntelliJ IDEA with a dedicated and powerful run configuration manager.
+Tired of manually configuring a new generic Python script for every Odoo project, database, or test run? This plugin eliminates repetitive setup by providing a first-class "Odoo" run configuration type, designed specifically for the needs of Odoo developers.
 
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
+## Key Features:
+ - Dedicated Odoo Run Configuration: A new "Odoo" configuration type appears directly in your Run/Debug Configurations dialog, with specialized fields for Odoo.
+ - Odoo-Specific Fields: Easily set the path to `odoo-bin`, specify a database (-d flag), and add any other arbitrary command-line arguments.
+ - Advanced Addons Path Editor: Manage your addons paths with a user-friendly list editor that supports adding, removing, and editing multiple directory paths.
+ - Powerful Template System:
+   - Save frequently used configurations (e.g., "Run Odoo 18 Server", "Run Odoo 19", "Run Tests," "Update Modules") as templates.
+   - Manage your templates in a dedicated settings panel (`File > Settings > Odoo Settings`).
+   - Quickly apply a template to any run configuration to instantly populate all fields.
+ 
+## How It Helps:
+ - Boost Productivity: Spend less time configuring and more time coding.
+ - Ensure Consistency: Standardize run configurations across your team and projects with shared templates.
+ - Reduce Errors: Avoid typos and mistakes from manually entering paths and parameters.
 
-To keep everything working, do not remove `<!-- ... -->` sections. 
+## Getting Started:
+ 1. Go to `Run > Edit Configurations...`
+ 2. Click the + (Add New Configuration) button.
+ 3. Select "Odoo" from the list and start configuring
 <!-- Plugin description end -->
 
 ## Installation
