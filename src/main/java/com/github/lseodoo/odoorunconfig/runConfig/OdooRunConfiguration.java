@@ -77,20 +77,4 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     protected SettingsEditor<PythonRunConfiguration> createConfigurationEditor() {
         return new OdooConfigurationFragmentEditor(this);
     }
-
-    // TODO: double check if still used and why
-//    public String getOdooBinFilePath() { return myOdooRunConfig.getOdooBinFilePath(); }
-//    public void setOdooBinFilePath(String path) {
-//        myOdooRunConfig.setOdooBinFilePath(path);
-//        setScriptName(path);
-//    }
-//    public String getOdooParametersDb() { return myOdooRunConfig.getOdooParametersDb(); }
-//    public void setOdooParametersDb(String odooParametersDb) { this.myOdooRunConfig.setOdooParametersDb(odooParametersDb); }
-//    public String getOdooParametersExtra() { return myOdooRunConfig.getOdooParametersExtra(); }
-//    public void setOdooParametersExtra(String params) {
-//        myOdooRunConfig.setOdooParametersExtra(params);
-//        setScriptParameters(params);
-//    }
-//    public List<String> getAddonsPaths() { return myOdooRunConfig.getOdooParametersAddonsPath(); }
-//    public void setAddonsPaths(List<String> paths) { myOdooRunConfig.setOdooParametersAddonsPath(paths); }
 }
