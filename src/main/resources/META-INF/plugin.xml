@@ -3,7 +3,7 @@
     <id>com.github.lseodoo.odoorunconfig</id>
     <name>Odoo Run Configuration</name>
     <vendor>lse-odoo</vendor>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 
     <!-- Please update the since-build and until-build attributes as needed -->
     <idea-version since-build="252" />
