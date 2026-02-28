@@ -62,13 +62,13 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     @Override
     public void readExternal(@NotNull Element element) {
         super.readExternal(element);
-        XmlSerializer.deserializeInto(this, element);
+        XmlSerializer.deserializeInto(myOdooRunConfig, element);
     }
 
     @Override
     public void writeExternal(@NotNull Element element) {
         super.writeExternal(element);
-        XmlSerializer.serializeInto(this, element);
+        XmlSerializer.serializeInto(myOdooRunConfig, element);
     }
 
     @NotNull
