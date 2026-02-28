@@ -87,7 +87,6 @@ abstract class AbstractOdooRunPanel {
                     emptyText.text = "e.g., my_odoo_db"
                     databaseField = this
                 }.align(AlignX.FILL)
-                    .comment("The database to connect to (appends the -d flag). Leave empty to use the default.")
             }
 
             row("Addons paths:") {
