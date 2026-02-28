@@ -93,14 +93,14 @@ class OdooConfigurable : BoundConfigurable("Odoo Settings") {
                         .onIsModified {
                             // Force save the active row before comparing
                             if (lastSelectedIndex >= 0) {
-                                odooTemplateSetting.applyTo(listModel.get(lastSelectedIndex).runConfig)
+                                odooTemplateSetting.applyTo(listModel.get(lastSelectedIndex))
                             }
                             listModel.elements().toList() != settings.runTemplates
                         }
                         .onApply {
                             // Save the active row before applying to state
                             if (lastSelectedIndex >= 0) {
-                                odooTemplateSetting.applyTo(listModel.get(lastSelectedIndex).runConfig)
+                                odooTemplateSetting.applyTo(listModel.get(lastSelectedIndex))
                             }
                             // Deep copy the list so we don't store UI list references in the state
                             settings.runTemplates = listModel.elements().toList().map {
