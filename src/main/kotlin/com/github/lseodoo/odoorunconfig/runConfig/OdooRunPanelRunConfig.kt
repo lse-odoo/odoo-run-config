@@ -31,7 +31,7 @@ class OdooRunPanelRunConfig : AbstractOdooRunPanel() {
             if (!templateName.isNullOrBlank()) {
                 // Create the new template
                 val newTemplate = OdooRunTemplate(name = templateName)
-                applyTo(newTemplate)
+                applyTo(newTemplate.runConfig)
                 OdooSettingService.instance.state.runTemplates.add(newTemplate)
             }
         }

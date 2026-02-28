@@ -26,13 +26,13 @@ class OdooConfigurationFragmentEditor(odooRunConfiguration: OdooRunConfiguration
             { config, _ ->
                 (config as? OdooRunConfiguration)?.let {
                     // Populate UI from Run Configuration
-                    commonUi.resetFrom(it.odooBinFilePath, it.odooParametersDb, it.addonsPaths, it.odooParametersExtra)
+                    commonUi.resetFrom(it.myOdooRunConfig)
                 }
             },
             { config, _ ->
                 (config as? OdooRunConfiguration)?.let {
                     // Save UI data back into Run Configuration
-                    commonUi.applyTo(it)
+                    commonUi.applyTo(it.myOdooRunConfig)
                 }
             },
             { true }

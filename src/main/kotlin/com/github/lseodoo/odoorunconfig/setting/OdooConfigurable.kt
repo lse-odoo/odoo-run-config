@@ -38,7 +38,7 @@ class OdooConfigurable : BoundConfigurable("Odoo Settings") {
             // Save current UI data to the PREVIOUSLY selected template
             if (lastSelectedIndex in 0 until listModel.size) {
                 val previousTemplate = listModel.get(lastSelectedIndex)
-                commonUi.applyTo(previousTemplate)
+                commonUi.applyTo(previousTemplate.runConfig)
 
                 // Refresh the list visually in case the user edited the template's name
                 listModel.setElementAt(previousTemplate, lastSelectedIndex)
@@ -48,13 +48,7 @@ class OdooConfigurable : BoundConfigurable("Odoo Settings") {
             val currentIndex = templateList.selectedIndex
             if (currentIndex in 0 until listModel.size) {
                 val currentTemplate = listModel.get(currentIndex)
-                commonUi.resetFrom(
-                    currentTemplate.name,
-                    currentTemplate.runConfig.odooBinFilePath,
-                    currentTemplate.runConfig.odooParametersDb,
-                    currentTemplate.runConfig.odooParametersAddonsPath as List<String>,
-                    currentTemplate.runConfig.odooParametersExtra
-                )
+                commonUi.resetFrom(currentTemplate.runConfig)
                 // Enable the right panel so the user can type
                 commonUi.panel.apply { isEnabled = true; isVisible = true }
             } else {
@@ -100,14 +94,14 @@ class OdooConfigurable : BoundConfigurable("Odoo Settings") {
                         .onIsModified {
                             // Force save the active row before comparing
                             if (lastSelectedIndex >= 0) {
-                                commonUi.applyTo(listModel.get(lastSelectedIndex))
+                                commonUi.applyTo(listModel.get(lastSelectedIndex).runConfig)
                             }
                             listModel.elements().toList() != settings.runTemplates
                         }
                         .onApply {
                             // Save the active row before applying to state
                             if (lastSelectedIndex >= 0) {
-                                commonUi.applyTo(listModel.get(lastSelectedIndex))
+                                commonUi.applyTo(listModel.get(lastSelectedIndex).runConfig)
                             }
                             // Deep copy the list so we don't store UI list references in the state
                             settings.runTemplates = listModel.elements().toList().map {

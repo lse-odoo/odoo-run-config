@@ -72,6 +72,7 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
         return new OdooConfigurationFragmentEditor(this);
     }
 
+    // TODO: double check if still used and why
     public String getOdooBinFilePath() { return myOdooRunConfig.getOdooBinFilePath(); }
     public void setOdooBinFilePath(String path) {
         myOdooRunConfig.setOdooBinFilePath(path);

@@ -113,35 +113,21 @@ abstract class AbstractOdooRunPanel {
 
     // --- Data Binding Methods ---
 
-    fun resetFrom(name: String, binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
-        odooBinField.text = binPath ?: ""
-        databaseField.text = dbName ?: ""
+    fun resetFrom(odooRunConfig: OdooRunConfig) {
+        odooBinField.text = odooRunConfig.odooBinFilePath ?: ""
+        databaseField.text = odooRunConfig.odooParametersDb ?: ""
         addonsListModel.apply {
             clear()
-            addAll(addons)
+            addAll(odooRunConfig.odooParametersAddonsPath)
         }
-        paramsEditor.text = extraParams ?: ""
+        paramsEditor.text = odooRunConfig.odooParametersExtra ?: ""
     }
 
-    fun resetFrom(binPath: String?, dbName: String?, addons: List<String>, extraParams: String?) {
-        // Just call the main method and pass an empty string for the name
-        resetFrom("", binPath, dbName, addons, extraParams)
-    }
-
-    // Save data from UI to an OdooRunTemplate (Used in Settings)
-    fun applyTo(template: OdooRunTemplate) {
-        template.runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
-        template.runConfig.odooParametersDb = databaseField.text.ifBlank { null }
-        template.runConfig.odooParametersAddonsPath = addonsListModel.elements().toList().toMutableList()
-        template.runConfig.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
-    }
-
-    // Save data from UI to an active Run Configuration (Used in Fragments)
-    fun applyTo(runConfig: OdooRunConfiguration) {
-        runConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
-        runConfig.odooParametersDb = databaseField.text.ifBlank { null }
-        runConfig.addonsPaths = addonsListModel.elements().toList().toMutableList()
-        runConfig.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
+    fun applyTo(odooRunConfig: OdooRunConfig) {
+        odooRunConfig.odooBinFilePath = odooBinField.text.ifBlank { null }
+        odooRunConfig.odooParametersDb = databaseField.text.ifBlank { null }
+        odooRunConfig.odooParametersAddonsPath = addonsListModel.elements().toList().toMutableList()
+        odooRunConfig.odooParametersExtra = paramsEditor.text.trim().ifBlank { null }
     }
 
     // --- Toolbar Helper ---
