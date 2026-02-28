@@ -14,7 +14,7 @@ data class OdooRunConfig(
     var odooParametersDb: String? = null,
 
     @XCollection(elementName = "odoo-parameters-addons-path")
-    var odooParametersAddonsPath: MutableList<String?>? = ArrayList(),
+    var odooParametersAddonsPath: MutableList<String> = mutableListOf(),
 
     @Attribute("odoo-parameters-extra")
     var odooParametersExtra: String? = null,
