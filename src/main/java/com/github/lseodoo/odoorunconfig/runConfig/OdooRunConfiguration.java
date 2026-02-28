@@ -29,6 +29,7 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
 
     @Override
     public void checkConfiguration() throws RuntimeConfigurationException {
+        setScriptName(getScriptName());  // FIX: avoid "Run Configuration Error: Please specify a script name"
         super.checkConfiguration();
 
         if (myOdooRunConfig.getOdooBinFilePath() != null && !myOdooRunConfig.getOdooBinFilePath().endsWith("odoo-bin")) {
