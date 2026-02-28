@@ -31,25 +31,30 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     public void checkConfiguration() throws RuntimeConfigurationException {
         super.checkConfiguration();
 
-        if (getOdooBinFilePath() != null && !getOdooBinFilePath().endsWith("odoo-bin")) {
+        if (myOdooRunConfig.getOdooBinFilePath() != null && !myOdooRunConfig.getOdooBinFilePath().endsWith("odoo-bin")) {
             throw new RuntimeConfigurationException("The odoo-bin file path must end with 'odoo-bin'");
         }
+    }
+
+    @Override
+    public String getScriptName() {
+        return myOdooRunConfig.getOdooBinFilePath();
     }
 
     @Override
     public String getScriptParameters() {
         List<String> allOdooParams = new ArrayList<>();
 
-        if (getOdooBinFilePath() != null) {
+        if (myOdooRunConfig.getOdooParametersDb() != null) {
             allOdooParams.add("-d");
-            allOdooParams.add(getOdooParametersDb());
+            allOdooParams.add(myOdooRunConfig.getOdooParametersDb());
         }
 
-        if (!getAddonsPaths().isEmpty()) {
-            allOdooParams.add("--addons-path="+String.join(",", getAddonsPaths()));
+        if (!myOdooRunConfig.getOdooParametersAddonsPath().isEmpty()) {
+            allOdooParams.add("--addons-path="+String.join(",", myOdooRunConfig.getOdooParametersAddonsPath()));
         }
 
-        allOdooParams.add(super.getScriptParameters());
+        allOdooParams.add(myOdooRunConfig.getOdooParametersExtra());
 
         return String.join(" ", allOdooParams);
     }
@@ -73,18 +78,18 @@ public class OdooRunConfiguration extends PythonRunConfiguration {
     }
 
     // TODO: double check if still used and why
-    public String getOdooBinFilePath() { return myOdooRunConfig.getOdooBinFilePath(); }
-    public void setOdooBinFilePath(String path) {
-        myOdooRunConfig.setOdooBinFilePath(path);
-        setScriptName(path);
-    }
-    public String getOdooParametersDb() { return myOdooRunConfig.getOdooParametersDb(); }
-    public void setOdooParametersDb(String odooParametersDb) { this.myOdooRunConfig.setOdooParametersDb(odooParametersDb); }
-    public String getOdooParametersExtra() { return myOdooRunConfig.getOdooParametersExtra(); }
-    public void setOdooParametersExtra(String params) {
-        myOdooRunConfig.setOdooParametersExtra(params);
-        setScriptParameters(params);
-    }
-    public List<String> getAddonsPaths() { return myOdooRunConfig.getOdooParametersAddonsPath(); }
-    public void setAddonsPaths(List<String> paths) { myOdooRunConfig.setOdooParametersAddonsPath(paths); }
+//    public String getOdooBinFilePath() { return myOdooRunConfig.getOdooBinFilePath(); }
+//    public void setOdooBinFilePath(String path) {
+//        myOdooRunConfig.setOdooBinFilePath(path);
+//        setScriptName(path);
+//    }
+//    public String getOdooParametersDb() { return myOdooRunConfig.getOdooParametersDb(); }
+//    public void setOdooParametersDb(String odooParametersDb) { this.myOdooRunConfig.setOdooParametersDb(odooParametersDb); }
+//    public String getOdooParametersExtra() { return myOdooRunConfig.getOdooParametersExtra(); }
+//    public void setOdooParametersExtra(String params) {
+//        myOdooRunConfig.setOdooParametersExtra(params);
+//        setScriptParameters(params);
+//    }
+//    public List<String> getAddonsPaths() { return myOdooRunConfig.getOdooParametersAddonsPath(); }
+//    public void setAddonsPaths(List<String> paths) { myOdooRunConfig.setOdooParametersAddonsPath(paths); }
 }
